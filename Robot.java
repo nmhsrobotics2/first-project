@@ -33,10 +33,18 @@ private Spark leftMotor1 = new Spark (1);
 private Spark leftMotor2 = new Spark(2);
 private Spark rightMotor1 = new Spark(3);
 private Spark rightMotor2 = new Spark(4);
-private final Joystick XboxController = new Joystick(0);
+private final XboxController driverController = new XboxController(0);
+private final Timer timer1 = new Timer();
+/**
+ *
+ */
+
 private double startTime;
-private final  PWMSparkMax feedWheel = new PWMSparkMax(5);
-private final  PWMSparkMax launchWheel = new PWMSparkMax(6);
+private Spark feedWheel = new Spark(6);
+private Spark launchWheel = new Spark(5);
+double drivelimit = 1;
+double launchPower = 0;
+double feedPower = 0;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -115,25 +123,42 @@ leftMotor2.set(0.6);
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    double speed = -XboxController.getRawAxis(1)*0.9;
-    double turn = XboxController.getRawAxis(4)*0.5;
+    double speed = -driverController.getRawAxis(1)*0.8;
+    double turn = driverController.getRawAxis(4)*0.3;
      double left = speed + turn;
      double right = speed - turn;
 leftMotor1.set(left);
 leftMotor2.set(left);
   rightMotor1.set(-right);
   rightMotor2.set(-right);
-	if(XboxController.getTrigger()){
-    launchWheel.set(-1);
-    feedWheel.set(-.8);
+	
+  //launcher code 
+  if(driverController.getLeftBumper()){
+    launchPower = -1;
+    feedPower = -.2; 
   }
 else{
-  launchWheel.set(0);
-  feedWheel.set(0);
+ if(driverController.getRightBumper()){
+   timer1.reset();
 }
-  
+if(timer1.get() < 1.0 ){//spool up the launch wheel
+launchPower = 1;
+feedPower = 0;
+}
+else if(timer1.get() < 2.0){ //launch note
+  launchPower = 1;
+  feedPower = 1;
+}
+else{
+  launchPower = 0;
+feedPower = 0;}
+
+}
+ launchWheel.set(launchPower);
+    feedWheel.set(feedPower);
 
 
+/** */
   }
   /** This function is called once when the robot is disabled. */
   @Override
