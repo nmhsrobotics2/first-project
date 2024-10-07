@@ -42,7 +42,7 @@ private final Timer timer1 = new Timer();
 private double startTime;
 private Spark feedWheel = new Spark(6);
 private Spark launchWheel = new Spark(5);
-double drivelimit = 1;
+
 double launchPower = 0;
 double feedPower = 0;
   /**
@@ -133,33 +133,31 @@ leftMotor2.set(left);
   rightMotor2.set(-right);
 	
   //launcher code 
-  if(driverController.getLeftBumper()){
-    launchPower = -1;
-    feedPower = -.2; 
+  if(driverController.getLeftBumper()){//intake code
+    launchWheel.set(-1);
+    feedWheel.set(-.2); 
   }
-else{
- if(driverController.getRightBumper()){
-   timer1.reset();
+  else if 
+  (driverController.getRightBumper()){
+    launchWheel.set(1);
+    feedWheel.set(0); 
+    if (driverController.getLeftBumper()){
+      launchWheel.set(1); 
+      feedWheel.set(1);
+    }
+  }
+else {
+  launchWheel.set(0);
+  feedWheel.set(0);
 }
-if(timer1.get() < 1.0 ){//spool up the launch wheel
-launchPower = 1;
-feedPower = 0;
-}
-else if(timer1.get() < 2.0){ //launch note
-  launchPower = 1;
-  feedPower = 1;
-}
-else{
-  launchPower = 0;
-feedPower = 0;}
+    
+  
+  
 
 }
- launchWheel.set(launchPower);
-    feedWheel.set(feedPower);
-
 
 /** */
-  }
+  
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {}
